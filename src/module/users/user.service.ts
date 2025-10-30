@@ -22,7 +22,6 @@ export class UserService {
   eventEmitter.emit("ConfirmEmail", { email:body.email, otp })
   return await this.userRepo.create({ ...userData, password: hashedPassword,otp:hashOtp })
   }
-  
 
  async signIn(body:signInDto){
   const user =await this.userRepo.findOne({ email:body.email })
