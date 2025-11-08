@@ -1,6 +1,7 @@
 import { MongooseModule, Prop, Schema, SchemaFactory, Virtual } from "@nestjs/mongoose";
 import { HydratedDocument } from "mongoose";
 import { UserGender, UserProvider, UserRole } from "src/common/enum";
+import type { HydratedOtpDocument } from "./otp.model";
 
 @Schema({timestamps:true,strictQuery:true, toObject:{virtuals:true},
     toJSON:{virtuals:true}})
@@ -13,9 +14,10 @@ export class User{
         get(){
             return this.fName+" "+this.lName
         },
-        set(v){
-            this.fName=v.split(' ')[0];
-            this.lName=v.split(' ')[1];
+        set:function(v:string){
+            const [fName,lName]=v.split(' ')
+            this.fName=fName
+            this.lName=lName
         }
     })
     userName:string;
@@ -25,8 +27,6 @@ export class User{
     password:string;
     @Prop({type:Number,min:18,max:80,required:true})
     age:number;
-    @Prop({type:String})
-    otp:string;
     @Prop({type:Boolean})
     confirmed:boolean
     @Prop({type:String,enum:UserRole,default:UserRole.user})
@@ -37,6 +37,8 @@ export class User{
     provider:UserProvider;
     @Prop({type:Date,default:Date.now})
     changeCredntialAt:Date;
+    @Virtual()
+    otp:HydratedOtpDocument;
 }
 
 
@@ -44,5 +46,10 @@ export const UserSchema = SchemaFactory.createForClass(User);
 
 export type HydratedUserDocument=HydratedDocument<User>
 
+UserSchema.virtual("otp",{
+    ref:"Otp",
+    localField:"_id",
+    foreignField:"createdBy"
+})
 
 export const UserModel=MongooseModule.forFeature([{ name: User.name, schema: UserSchema }])

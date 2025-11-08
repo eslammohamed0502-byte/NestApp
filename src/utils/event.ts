@@ -1,25 +1,26 @@
 
 import { EventEmitter } from "events";
-import { emailTemplate } from "src/service/email_template";
-import { sendEmail } from "src/service/send_email";
+import { OtpTypes } from "src/common/enum";
+import { emailTemplate } from "src/common/service/email_template";
+import { sendEmail } from "src/common/service/send_email";
 
 export const eventEmitter=new EventEmitter()
 
 
- eventEmitter.on("ConfirmEmail",async(data)=>{
+ eventEmitter.on(OtpTypes.ConfirmEmail,async(data)=>{
         const {email,otp}=data
               await sendEmail({
                 to:email,
-                subject:"Welcome to Social Media App",
+                subject:OtpTypes.ConfirmEmail,
                 html:emailTemplate(otp as unknown as string,"Email Confirmation")
               })
     })
 
-    eventEmitter.on("forgetPassword",async(data)=>{
+    eventEmitter.on(OtpTypes.ForgotPassword,async(data)=>{
         const {email,otp}=data
               await sendEmail({
                     to:email,
-                    subject:"Forgot Your Password",
+                    subject:OtpTypes.ForgotPassword,
                     html:emailTemplate(otp as unknown as string,"Forgot Password")
                   })
     })
